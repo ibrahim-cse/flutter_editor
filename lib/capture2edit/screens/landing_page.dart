@@ -5,7 +5,7 @@ import 'package:flutter_editor/capture2edit/screens/slideshow.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../common/logout_promt.dart';
-import 'editor.dart';
+import 'image_painter.dart';
 
 class LandingForm extends StatefulWidget {
   @override

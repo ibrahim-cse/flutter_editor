@@ -51,15 +51,13 @@ class _NativeExifState extends State<NativeExif> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
           title: const Text('Native Exif'),
-          actions: [
-            ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back),
-                label: Text(''))
-          ],
         ),
         body: Center(
           child: Column(
@@ -103,7 +101,7 @@ class _NativeExifState extends State<NativeExif> {
                     )
                   ],
                 ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               ElevatedButton(

@@ -39,7 +39,7 @@ class _ProgressIndicatorPageState extends State<ProgressIndicatorPage> with Sing
     super.initState();
 
     controller = AnimationController(
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
       vsync: this,
     );
 
@@ -54,7 +54,7 @@ class _ProgressIndicatorPageState extends State<ProgressIndicatorPage> with Sing
   }
 
   Future startDownload() async {
-    final url = 'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_640_3MG.mp4';
+    const url = 'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_640_3MG.mp4';
 
     final request = Request('GET', Uri.parse(url));
     final response = await Client().send(request);

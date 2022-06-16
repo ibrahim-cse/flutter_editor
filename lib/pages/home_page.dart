@@ -2,14 +2,18 @@
 
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_editor/screens/download_percentade.dart';
-import 'package:flutter_editor/screens/exif.dart';
-import 'package:flutter_editor/screens/native_exif.dart';
-import 'package:flutter_editor/screens/progres_indicator.dart';
-import 'package:flutter_editor/screens/test_editor.dart';
-import 'package:flutter_editor/screens/watermark.dart';
+import 'package:flutter_editor/pages/download_percentade.dart';
+import 'package:flutter_editor/pages/exif.dart';
+import 'package:flutter_editor/pages/flutter_painter.dart';
+import 'package:flutter_editor/pages/native_exif.dart';
+import 'package:flutter_editor/pages/progres_indicator.dart';
+import 'package:flutter_editor/pages/speech2text_old.dart';
+import 'package:flutter_editor/pages/speech2text_ra.dart';
+import 'package:flutter_editor/pages/watermark.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../capture2edit/screens/login_form.dart';
 import 'circular_progress_bar.dart';
@@ -22,6 +26,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String dirPath = '';
   File? imageFile;
+
+  /// Download percentage properties
+  String? downloadMessage = 'Initializing...';
+  bool _isDownloading = false;
+  double _percentage = 0;
 
   _initialImageView() {
     if (imageFile == null) {
@@ -125,21 +134,60 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Image Metadata'),
+            title: const Text('Download file'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: [
-                  GestureDetector(
-                    child: const Text('Tap here to see metadata!'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ExifPackage(),
-                        ),
-                      );
-                    },
+                  Column(
+                    children: [
+                      FloatingActionButton.extended(
+                        onPressed: () async {
+                          setState(() {
+                            _isDownloading = !_isDownloading;
+                          });
+                          var dir = await getExternalStorageDirectory();
+
+                          Dio dio = Dio();
+                          dio.download(
+                            'https://www.sample-videos.com/img/Sample-jpg-image-2mb.jpg',
+                            '${dir!.path}/sample.jpg',
+                            onReceiveProgress: (actualBytes, totalBytes) {
+                              var percentage = actualBytes / totalBytes * 100;
+                              if (percentage < 100) {
+                                _percentage = percentage / 100;
+                                setState(() {
+                                  downloadMessage = 'Downloading... ${percentage.floor()}%';
+                                });
+                              } else {
+                                downloadMessage = 'Successfully downloaded! Click to download again.';
+                              }
+                            },
+                          );
+                        },
+                        label: const Text('Download'),
+                        icon: const Icon(Icons.file_download),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Text(downloadMessage ?? '', style: Theme.of(context).textTheme.headlineSmall),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: LinearProgressIndicator(value: _percentage),
+                      ),
+                    ],
                   ),
+                  // GestureDetector(
+                  //   child: const Text('Tap here to see metadata!'),
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => ExifPackage(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   const Padding(padding: EdgeInsets.all(8.0)),
                 ],
               ),
@@ -154,10 +202,14 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('View Image'),
         actions: [
-          ElevatedButton.icon(
-            onPressed: _showMetaDialog,
-            icon: Icon(Icons.info_outline_rounded),
-            label: Text(''),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: IconButton(
+                onPressed: _showMetaDialog,
+                icon: const Icon(Icons.file_download),
+              ),
+            ),
           ),
         ],
       ),
@@ -246,14 +298,14 @@ class _HomePageState extends State<HomePage> {
                     width: 250.0,
                     child: FlatButton(
                       child: const Text(
-                        'Exif',
+                        'Speech to Text RA',
                         style: TextStyle(color: Colors.white, fontSize: 16.0),
                       ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ExifPackage(),
+                            builder: (context) => Speech2TextRA(),
                           ),
                         );
                       },
@@ -271,14 +323,14 @@ class _HomePageState extends State<HomePage> {
                     width: 250.0,
                     child: FlatButton(
                       child: const Text(
-                        'Native Exif',
+                        'Speech to Text Old',
                         style: TextStyle(color: Colors.white, fontSize: 16.0),
                       ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => NativeExif(),
+                            builder: (context) => Speech2TextOld(),
                           ),
                         );
                       },
@@ -287,6 +339,9 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
+                  ),
+                  const SizedBox(
+                    height: 15.0,
                   ),
                 ],
               ),
@@ -323,72 +378,89 @@ class _HomePageState extends State<HomePage> {
             ),
             ExpansionTile(
               title: Text("Exif"),
-              childrenPadding: EdgeInsets.only(top: 1, bottom: 1),
               children: <Widget>[
-                SizedBox(
-                  height: 30,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(left: 50.0),
-                    title: const Text('Normal Exif'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ExifPackage(),
-                        ),
-                      );
-                    },
-                  ),
+                // SizedBox(
+                //   height: 30,
+                //   child: ListTile(
+                //     contentPadding: EdgeInsets.only(left: 50.0),
+                //     title: const Text('Normal Exif'),
+                //     onTap: () {
+                //       Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //           builder: (context) => ExifPackage(),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 50.0),
+                  title: const Text('Normal Exif'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExifPackage(),
+                      ),
+                    );
+                  },
                 ),
-                SizedBox(
-                  height: 50,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(left: 50.0),
-                    title: const Text('Native Exif'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NativeExif(),
-                        ),
-                      );
-                    },
-                  ),
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 50.0),
+                  title: const Text('Native Exif'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NativeExif(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
-            ListTile(
-              title: const Text('Progress Indicator'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProgressIndicatorPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Circular Progress Bar'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CircularProgressBar(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Download Percentage Bar'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DownloadPercentageBar(),
-                  ),
-                );
-              },
+            ExpansionTile(
+              title: const Text("Progress Bar"),
+              // childrenPadding: EdgeInsets.only(top: 1, bottom: 1),
+              children: <Widget>[
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 50.0),
+                  title: const Text('Download Percentage Bar'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DownloadPercentageBar(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 50.0),
+                  title: const Text('Progress Indicator'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProgressIndicatorPage(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  contentPadding: const EdgeInsets.only(left: 50.0),
+                  title: const Text('Circular Progress Bar'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CircularProgressBar(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
