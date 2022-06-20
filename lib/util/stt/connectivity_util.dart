@@ -17,13 +17,13 @@ void showNoInternetDialog(BuildContext context) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(title: new Text('Occucare'), content: new Text('Please check your internet connection....'), actions: <Widget>[
-          new FlatButton(
+        return AlertDialog(title: const Text('Occucare'), content: const Text('Please check your internet connection....'), actions: <Widget>[
+          FlatButton(
               onPressed: () {
                 print("popcheck");
                 Navigator.of(context).pop();
               },
-              child: new Text("Close"))
+              child: const Text("Close"))
         ]);
       });
 }

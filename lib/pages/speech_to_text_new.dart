@@ -93,7 +93,7 @@ class _SpeechToTextNewState extends State<SpeechToTextNew> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Speech to Text RA'),
+        title: const Text('Speech to Text New'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -108,6 +108,7 @@ class _SpeechToTextNewState extends State<SpeechToTextNew> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
+                    hintText: "Tap the mic and star speaking.",
                     floatingLabelBehavior: FloatingLabelBehavior.always),
               ),
               const SizedBox(height: 20),
