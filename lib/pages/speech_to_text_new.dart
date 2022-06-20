@@ -1,3 +1,4 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_editor/util/app_log.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -6,14 +7,14 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../util/stt/connectivity_util.dart';
 
-class Speech2TextRA extends StatefulWidget {
-  const Speech2TextRA({Key? key}) : super(key: key);
+class SpeechToTextNew extends StatefulWidget {
+  const SpeechToTextNew({Key? key}) : super(key: key);
 
   @override
-  _Speech2TextRAState createState() => _Speech2TextRAState();
+  _SpeechToTextNewState createState() => _SpeechToTextNewState();
 }
 
-class _Speech2TextRAState extends State<Speech2TextRA> {
+class _SpeechToTextNewState extends State<SpeechToTextNew> {
   TextEditingController tecComment = TextEditingController();
   SpeechToText? _speech;
   bool _listenLoop = false;
@@ -94,29 +95,38 @@ class _Speech2TextRAState extends State<Speech2TextRA> {
       appBar: AppBar(
         title: const Text('Speech to Text RA'),
       ),
-      body: Column(
-        children: [
-          InkWell(
-            onTap: () async {
-              startListening(true);
-            },
-            child: Padding(
-              padding: EdgeInsets.only(left: 19, right: 10),
-              child: Container(
-                height: _listenLoop ? 10 : 12,
-                width: _listenLoop ? 10 : 12,
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  border: Border.all(
-                    width: 2,
-                    color: Colors.redAccent,
-                  ),
-                  shape: _listenLoop ? BoxShape.rectangle : BoxShape.circle,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: tecComment,
+                maxLines: 20,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.always),
+              ),
+              const SizedBox(height: 20),
+              AvatarGlow(
+                animate: _listenLoop,
+                repeat: true,
+                endRadius: 80,
+                glowColor: Colors.red,
+                duration: const Duration(milliseconds: 1000),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    startListening(true);
+                  },
+                  child: Icon(_listenLoop ? Icons.mic : Icons.mic_none),
                 ),
               ),
-            ),
-          )
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

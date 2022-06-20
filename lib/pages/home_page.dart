@@ -10,7 +10,7 @@ import 'package:flutter_editor/pages/flutter_painter.dart';
 import 'package:flutter_editor/pages/native_exif.dart';
 import 'package:flutter_editor/pages/progres_indicator.dart';
 import 'package:flutter_editor/pages/speech2text_old.dart';
-import 'package:flutter_editor/pages/speech2text_ra.dart';
+import 'package:flutter_editor/pages/speech_to_text_new.dart';
 import 'package:flutter_editor/pages/watermark.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
@@ -246,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                     width: 250.0,
                     child: FlatButton(
                       child: const Text(
-                        'Image Editor',
+                        'Flutter Painter',
                         style: TextStyle(color: Colors.white, fontSize: 16.0),
                       ),
                       onPressed: () {
@@ -261,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
@@ -286,7 +286,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
@@ -298,20 +298,20 @@ class _HomePageState extends State<HomePage> {
                     width: 250.0,
                     child: FlatButton(
                       child: const Text(
-                        'Speech to Text RA',
+                        'Speech To Text New',
                         style: TextStyle(color: Colors.white, fontSize: 16.0),
                       ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Speech2TextRA(),
+                            builder: (context) => SpeechToTextNew(),
                           ),
                         );
                       },
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
@@ -323,20 +323,20 @@ class _HomePageState extends State<HomePage> {
                     width: 250.0,
                     child: FlatButton(
                       child: const Text(
-                        'Speech to Text Old',
+                        'Speech To Text Old',
                         style: TextStyle(color: Colors.white, fontSize: 16.0),
                       ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Speech2TextOld(),
+                            builder: (context) => SpeechToTextOld(),
                           ),
                         );
                       },
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),

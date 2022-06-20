@@ -1,120 +1,109 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
-import 'package:highlight_text/highlight_text.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_to_text.dart' as stts;
 
-class Speech2TextOld extends StatefulWidget {
+class SpeechToTextOld extends StatefulWidget {
+  const SpeechToTextOld({Key? key}) : super(key: key);
+
   @override
-  _Speech2TextOldState createState() => _Speech2TextOldState();
+  _SpeechToTextOldState createState() => _SpeechToTextOldState();
 }
 
-class _Speech2TextOldState extends State<Speech2TextOld> {
-  stt.SpeechToText? _speech;
-  bool _isListening = false;
-  String _text = 'Tap on the mic and start speaking...';
-  double _confidence = 1.0;
+class _SpeechToTextOldState extends State<SpeechToTextOld> {
+  var _speechToText = stts.SpeechToText();
+  bool isListening = false;
+  String initialMessage = 'Press the button for speaking.';
 
-  final Map<String, HighlightedWord> _highlights = {
-    'Name': HighlightedWord(
-      onTap: () => print('flutter'),
-      textStyle: const TextStyle(
-        color: Colors.blue,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'Address': HighlightedWord(
-      onTap: () => print('voice'),
-      textStyle: const TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'Fault': HighlightedWord(
-      onTap: () => print('subscribe'),
-      textStyle: const TextStyle(
-        color: Colors.red,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'Need': HighlightedWord(
-      onTap: () => print('like'),
-      textStyle: const TextStyle(
-        color: Colors.blueAccent,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'Stop': HighlightedWord(
-      onTap: () => print('comment'),
-      textStyle: const TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  };
+  final TextEditingController _textEditingController = TextEditingController();
+
+  void listen() async {
+    if (!isListening) {
+      bool available = await _speechToText.initialize(
+        onStatus: (status) => print('status: $status'),
+        onError: (errorMessage) => print('errorMessage: $errorMessage'),
+      );
+      if (available) {
+        setState(() {
+          isListening = true;
+        });
+        _speechToText.listen(
+          onResult: (result) => setState(() {
+            initialMessage = result.recognizedWords;
+            _textEditingController.text = result.recognizedWords;
+          }),
+        );
+      }
+    } else {
+      setState(() {
+        isListening = false;
+      });
+      _speechToText.stop();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _speech = stt.SpeechToText();
+    _speechToText = stts.SpeechToText();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confidence: ${(_confidence * 100.0).toStringAsFixed(1)}%'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: AvatarGlow(
-        animate: _isListening,
-        glowColor: Theme.of(context).primaryColor,
-        endRadius: 75.0,
-        duration: const Duration(milliseconds: 2000),
-        repeatPauseDuration: const Duration(milliseconds: 100),
-        repeat: true,
-        child: FloatingActionButton(
-          onPressed: _listen,
-          child: Icon(_isListening ? Icons.mic : Icons.mic_none),
-        ),
+        title: const Text('Speech To Text'),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        reverse: true,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30.0),
-          child: TextHighlight(
-            text: _text,
-            words: _highlights,
-            textStyle: const TextStyle(
-              fontSize: 30.0,
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // TextField(
+              //   maxLength: 10000,
+              //   maxLines: 20,
+              //   keyboardType: TextInputType.multiline,
+              //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              //   controller: _textEditingController,
+              //   decoration: InputDecoration(
+              //       // labelText: initialMessage,
+              //       // labelStyle: theme.textTheme.headline6,
+              //       // suffixText: initialMessage,
+              //       border: const OutlineInputBorder(
+              //         borderSide: BorderSide(color: Colors.red, width: 2),
+              //       ),
+              //       hintText: initialMessage,
+              //       floatingLabelBehavior: FloatingLabelBehavior.always),
+              // ),
+              TextFormField(
+                controller: _textEditingController,
+                maxLines: 20,
+                keyboardType: TextInputType.multiline,
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
+                    ),
+                    hintText: initialMessage,
+                    floatingLabelBehavior: FloatingLabelBehavior.always),
+              )
+            ],
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate: isListening,
+        repeat: true,
+        endRadius: 80,
+        glowColor: Colors.red,
+        duration: const Duration(milliseconds: 1000),
+        child: FloatingActionButton(
+          onPressed: () {
+            listen();
+          },
+          child: Icon(isListening ? Icons.mic : Icons.mic_none),
+        ),
+      ),
     );
-  }
-
-  void _listen() async {
-    if (!_isListening) {
-      bool available = await _speech!.initialize(
-        onStatus: (val) => print('onStatus: $val'),
-        onError: (val) => print('onError: $val'),
-      );
-      if (available) {
-        setState(() => _isListening = true);
-        _speech!.listen(
-          onResult: (val) => setState(() {
-            _text = val.recognizedWords;
-            if (val.hasConfidenceRating && val.confidence > 0) {
-              _confidence = val.confidence;
-            }
-          }),
-        );
-      }
-    } else {
-      setState(() => _isListening = false);
-      _speech!.stop();
-    }
   }
 }

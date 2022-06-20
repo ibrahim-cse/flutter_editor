@@ -60,10 +60,9 @@ dependencies:
   archive: ^3.1.6
 #  Speech to text
   speech_to_text: ^5.5.0
+  avatar_glow: ^2.0.2
   flutter_logs: ^2.1.6
   connectivity_plus: ^2.3.4
-  highlight_text: ^1.4.0
-  avatar_glow: ^2.0.2
 
 dev_dependencies:
   flutter_test:
